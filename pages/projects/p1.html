@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>Project 1</title>
+
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="../../assets/css/main.css" />
+
+		<script src="https://kit.fontawesome.com/bf29e9576a.js" crossorigin="anonymous"></script>
+
+		<noscript><link rel="stylesheet" href="../../assets/css/noscript.css" /></noscript>
+	</head>
+
+	<body>
+
+		<section id="one" class="main style1">
+			<div class="container">
+				<h1>Movies Dataset Exploration</h1>
+
+				<h4><strong>Dataset Used:</strong><a target="_blank" href="https://www.kaggle.com/danielgrijalvas/movies"> Movies Dataset</a></h4>
+				<h4><strong>Skills Highlighted:</strong> Data Transformation, Data Cleaning, Data Visualization</h4>
+				<hr>
+
+				<section>
+					<p>&emsp; Before I start in data wrangling (data cleaning, transformation, etc.), <strong>I want to make sure I understand what the dataset
+					is about.</strong> Thus, I often read the metadata (description of the data) of the dataset provided by its owner. There were only 
+					seven-thousand five hundred twelve unique observations (rows) in the dataset, which Excel can easily handle.</p>
+
+					<p>&emsp; I noticed that some of the column names are difficult to understand without its metadata. Therefore, <strong>I decided to rename
+					these columns, so I can avoid potential confusion in the future.</strong></p>
+
+					<div class="row">
+						<div class="col-6 col-12-medium">
+							<h4>Columns renamed:</h4>
+
+							<ul>
+								<li><strong>year to year_released</strong> (The year it was released)</li>
+								<li><strong>released to date_released</strong> (The date it was released)</li>
+								<li><strong>score to imdb_score</strong> (Movie score from the IMDB (Internet Movie Database) Website</li>
+								<li><strong>votes to imdb_votes</strong> (The number of votes it received from IMDB)</li>
+								<li><strong>country to country_imdb_rating</strong> (The country where the votes came from)</li>
+								<li><strong>gross to gross_revenue</strong> (The revenue minus the expenses)</li>
+							</ul>
+						</div>
+					</div>
+
+
+					<p>&emsp; I turned the data range into a table. Tables in Excel gives the user additional tools that help with thier anlaysis.
+					Next, <strong>I added a filter to my table to quickly scan if some of our columns have empty values.</strong> I noticed that the rating column has 
+					empty values.</p>
+
+					<p>&emsp; I used this formula to fill the blank values with "No Rating". This checks if the cells were empty. If True, it will enter "No Rating",
+					and if False it will take the current value instead.</p>
+
+					<pre>
+						<code>=IF(ISBLANK([@rating]), "No Rating", [@rating])</code>
+					</pre>
+
+					<p>&emsp; Empty values were also present in the writer, star, company, and imdb_country_rating, so I used the same procedure to fill in <strong>(I used "NA" instead of "No Rating")</strong> the blank values.</p>
+
+					<p>&emsp; I also noticed empty cells in imdb_votes, imdb_score, gross_revenue, budget, and runtime. However, <strong>these columns contains numbers.
+					</strong>, and <strong>I don't want to fill it with "NA"s that are string.</strong> I want to <strong>make sure that each of the columns have their
+					rows in a same data type.</strong></p>
+
+					<p>&emsp; Initially, I was thinking of dropping these values because it might skew the analysis later. However, after inspection, out of seven-thousand five hundrd unique obseervations, thirty percent of it has empty cells either in imdb_votes, imdb_score,gross_revenue, budget, or runtime columns.</p>
+
+					<blockquote>In real world scenarios, I will ask my project manager or stakeholders for a more complete dataset or use a proxy data.</blockquote>
+
+					<p>&emsp; I decided to replace these empty cells with number zero. <strong>I used the previous formula for empty values in rating</strong> because it also works for this scenario.</p>
+
+					<p>I noticed that there were two values in the date_released that were empty. <strong>There were only two values, so I decided to look up their values in the IMDB website.</strong> I chose their U.S.A. released date because the majority of the data were in U.S.A. Next, the values in date_released were stored as strings and not dates. Moreover, the values also has the country where it was released.<strong> I decided to use text-to-columns feature in Excel to separate the two.</strong>However, this will return an inconsistent and messy results because we don't have a distinct separator.</p>
+
+					<blockquote>Spaces are out of the question. The date_released column has country names that have two or more words in them. Using spaces as delimiters will also separate these country names.</blockquote>
+
+					<!-- Include an example -->
+
+					<p>&emsp; After spending some time with it, I decided to create a formula that will take the specific space between the date and the country name. Then, replace that space with an underscore. <strong>Replacing the space with an underscore guarantees that the date and country name has a distinct separator.</strong> Then we will use the text to columns tool in Excel to seprate them.</p>
+
+					<pre>
+						<code>=REPLACE($A1, FIND("(", $A1) - 1, 1, "_")</code>
+					</pre>
+
+					<div class="row gtr-150">
+						<div class="col-3 col-12-medium">	
+							<span class="image fit">
+								<img class="materialboxed" src="../../images/projects/p1/text_to_columns_date.png" alt="Sample results">
+							</span>
+						</div>
+					</div>
+
+					<h5>Click the images to view in full size!</h5>
+
+					<p>&emsp; The country name extracted from date_released columns has parethenses around them and I do not need that. Thus, <strong>I used this formula to take only the country name.</strong></p>
+
+					<pre>
+						<code>=MID([@[@date_released]], FIND("(", [@[date_released]]) + 1, (LEN([@[date_released]]) - FIND("(", [@[date_released]])) - 1)</code>
+					</pre>
+
+					<p>&emsp; This will tell Excel to extract the characters after the first parenthesis up to the character before the last parenthesis.</p>
+
+
+					<p>&emsp; The string formatted dates still gave me some trouble. I tried multiple conversions through Excel but it does not change every instance. 
+					So, <strong>I decided to use Python for converting these dates.</strong></p>
+
+					<p>&emsp; After importing the transformed dataset in Jupyter Notebook (A place to run Python code), I want <strong>make sure that all my columns has no empty values. This line of code will return the total number of empty cells in each row.</strong></p>
+
+					<pre>
+						<code>movies_clean.isnull().sum()</code>
+					</pre>
+
+					<p>&emsp; Next, I used this line of code to <strong>convert the string dates into a datetime format and store the converted into a new column</strong></p>
+
+					<pre>
+						<code>movies_clean['date_released_fix'] = pd.to_datetime(movies_clean['date_released'])</code>
+					</pre>
+
+					<p>&emsp; I no longer need the string dates from the year_released column so I decided to drop it. Moreover, I want to rename the date_released_fix column to date_released. Finally, I noticed that the year_released columns has their values different from the year in the date_released column. I used this line
+					of code to <strong>extract the year in the date_released column and replace the valus in the year_released column.</strong></p>
+
+					<pre>
+						<code># we will drop the original date_released column so that date_released_fix will remain <br>movies_clean.drop(columns = ['date_released'], inplace = True) <br><br># renaming the date_released_fix columns back to date_released<br>movies_clean.rename(columns = {'date_released_fix': 'date_released'}, inplace = True)<br><br># so we will extract the year in the date_released column and replace the <br># values in year_released column using it <br>year_fix = movies_clean['date_released'].dt.year <br><br># replace the year_released values with the values of year_fix Series <br>movies_clean['year_released'] = year_fix
+						</code>
+					</pre>
+
+					<p>&emsp; This is the last step for my data cleaning process. Now, I decided to <strong>answer a question using this dataset and present it using Tableau.</strong> This is the question decided to ask:</p>
+
+					<blockquote>Are the number of Action movies steadily increased from 1980 to 2020?</blockquote>
+
+					<p>&emsp; I created three different charts that shows the growth and number of Action movies released from 1980 to 2020. Lastly, I combined them to create a dashboard and provided my interpretation.</p>
+
+					<div class="row gtr-150">
+						<div class="col-3 col-12-medium">
+							<span class="image fit"><img class="materialboxed" src="../../images/projects/p1/second_most_common_genre.png" alt="Second highest genre was Action"></span>
+						</div>
+
+						<div class="col-3 col-12-medium">
+							<span class="image fit"><img class="materialboxed" src="../../images/projects/p1/yearly_action_movies.png" alt="Action kept increasing from 1980 to 2020"></span>
+						</div>
+
+						<div class="col-3 col-12-medium">
+							<span class="image fit"><img class="materialboxed" src="../../images/projects/p1/massive_drop.png" alt="Massive drop in total movies released in 2020"></span>
+						</div>
+					</div>
+
+					<h5>Click the images to view in full size!</h5>
+
+					<br>
+
+					<h4><strong>Dashboard link: </strong><a target="_blank" href="https://public.tableau.com/app/profile/christian.lhie.besmanos/viz/movies_dataset_exploration_dashboard/action_movies_obseervation_dashboard?publish=yes">Movies Exploration Dashboard</a></h4>
+
+					<p>&emsp; <strong>Thank you for reaching this part!</strong> This marks the end of this project.</p>
+
+					<br>
+
+					<div class="container">
+						<a href="../../" class="button primary fit small">Back to Projects</a>
+					</div>
+					
+					<br>
+
+				</section>
+		</section>	
+
+		<!-- Footer -->
+		<section id="footer">
+			<ul class="icons">
+				<li><a target="_blank" href="https://www.linkedin.com/in/cellbesmanos" class="icon brands alt fa-linkedin"><span class="label">LinkedIn</span></a></li>
+				<li><a target="_blank" href="https://github.com/cellbesmanos" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+			</ul>
+			<ul class="copyright">
+				<li>Initial template provided by <a href="http://html5up.net">HTML5 UP</a></li>
+				<li>Images from <a href="https://unsplash.com/">Unsplash</a></li>
+				<li>&copy; 2021 Christian Lhie Besmanos</li>
+			</ul>
+		</section>
+
+    	<!-- JQuery CDN -->
+    	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+		<!-- Google Materialize compiled and minified JavaScript -->
+    	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" type="text/javascript"></script>
+
+    	<script>
+		  	$(document).ready(function(){
+				$('.materialboxed').materialbox();
+			});
+    	</script>
+	</body>
+</html>
+
