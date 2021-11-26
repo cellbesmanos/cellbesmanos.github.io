@@ -1,8 +1,0 @@
-Portfolio Building Checklist
-
-- All images can be zoomed in and out
-- Carousell for certificates
-- Projects should have their own 'blog-ish' pages
-- Clean up Github code
-
-- ALWAYS THINK ABOUT THE READER!
